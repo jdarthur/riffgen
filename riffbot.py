@@ -12,41 +12,20 @@ import random
 DONE: 
 	bing
 	variable length
-TODO:
 	multibing
-	different tone for notes
-		C7, A4, whatever...
+	tones
+	random sequence
+TODO:
 	different length for notes
 		quarter, eighth, whole, whatever
-	smooth bing dropoff
-	legato, staccato 
-	differ
-
+	better volume dropoff
+		more legato
+	note weighting
+		-might base it on last note played
+	random seeds to recreate a riff
+	improve note addition for performance
+		- numpy probably has a method like this already
 """
-
-
-def createSample(leng, rate, f = 440) :
-	fs = rate     # sampling rate, Hz, must be integer
-	duration = leng  # in seconds, may be float
-
-	# generate samples, note conversion to float32 array
-	samples = (np.sin(2*np.pi*np.arange(fs*duration)*f/fs)).astype(np.float32)
-	decibels = 0
-	negdec = 200
-	for i in range(0, len(samples)) :
-		#inc = ((vol*(duration << 6))/fs)
-		inc =  negdec * (1 / (leng * fs))
-		decibels = decibels - inc
-		#print(decibels)
-		#print(1 - inc)
-		vol = math.pow(10, decibels/20)
-		samples[i] = samples[i] * vol
-		if( i % 200 == 0) : 
-			pass
-			#print("vol: " + str(vol))
-			#print(decibels)
-		#print(vol)
-	return samples
 
 frequencies = { 
 'C'   :	261.626,
@@ -64,6 +43,19 @@ frequencies = {
 'rest' : 0,  
 }
 rate = 20000
+
+def createSample(leng, rate, f = 440) :
+	samples = (np.sin(2*np.pi*np.arange(rate*leng)*f/rate)).astype(np.float32)
+	decibels = 0
+	negdec = 200
+	for i in range(0, len(samples)) :
+		inc =  negdec * (1 / (leng * rate))
+		decibels = decibels - inc
+		vol = math.pow(10, decibels/20)
+		samples[i] = samples[i] * vol
+		if( i % 200 == 0) : 
+			pass
+	return samples
 
 def createNote(note, octave, leng=1, rate=rate) :
 	f = frequencies[note.upper()]
@@ -88,12 +80,6 @@ def add_sample(sample1, sample2, position, num_pos, rate=rate) :
 			rets[startpoint + i] += sample2[i]
 		else :
 			rets[startpoint + i] = (rets[startpoint + i] + sample2[i]) / 2
-		
-		"""
-		rets[startpoint + i] += sample2[i]
-		if rets[startpoint + i] > .55 :
-			rets[startpoint + i] = .55
-		"""
 
 	return rets
 
@@ -104,9 +90,7 @@ def rand_sequence(items, num_positions) :
 	seq = []
 	for i in range(0, items) :
 		note = random.choice(choices)
-		#print(note)
 		pos = random.randint(0, num_positions)
-		#print(pos)
 		seq.append((note, 4, pos))
 	return seq
 
@@ -114,8 +98,7 @@ def rand_sequence(items, num_positions) :
 
 
 timer = time.time()
-#sequence = [("c", 4) 'd', 'e', 'f', 'g', 'a', 'b', 'c']
-sequence = [("c", 4), ('d', 4), ("e", 4), ('f', 4),
+"""sequence = [("c", 4), ('d', 4), ("e", 4), ('f', 4),
 			("g", 4), ('a', 4), ("b", 4), ('c', 5),
 ]
 i = 0
@@ -128,9 +111,9 @@ seq2.append(("c", 4, 4))
 seq2.append(("c", 4, 6))
 seq2.append(("c", 4, 7))
 
+"""
 
 randseq = rand_sequence(12, 16)
-
 
 beats = 4
 positions = beats * 8
