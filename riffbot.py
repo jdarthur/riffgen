@@ -7,7 +7,6 @@ import time
 import sounddevice as sd
 import math
 import random
-import matplotlib
 
 """
 DONE: 
@@ -76,9 +75,78 @@ rate = 20000
 					METHODS
 ===================================================
 """
+def create_attackdecay(start_decibels, end_decibels, length):
+	"""
+	create a smaller array to control attack/decay in
+	the complete amplitude array. 
+
+	It will smoothly ramp decibels which correlated to a 
+	logarithmic increase/decrease in amplitude I believe.
+	"""
+
+	inc = (start_decibels - end_decibels) * (1 / length)
+	decibels = start_decibels
+	ar = []
+	for i in range(0, length) :
+		decibels = decibels - inc
+		vol = math.pow(10, decibels/20)
+		ar.append(vol)
+	return ar
+
+def create_ampl_array(leng, rate, decayfactor) :
+	"""
+	Create an array to control amplitude in the sample
+
+	This will use a fixed attack length (1/64 of leng * rate). 
+		Might rework this part if it matters
+	Decay is variable based on decayfactor [0.0 : 1.0)
+	I'm using this decay to do different articulations
+		i.e. staccato has a decay factor of about .8
+	"""
+	amplitude_array = []
+	high_db= 0
+	inaudible_db = -200
+
+	#attack phase
+	attack_length = int(leng * rate / 64)
+	att = create_attackdecay(inaudible_db, high_db, attack_length)
+
+	#decay phase
+	decay_length = int(leng * rate * decayfactor)
+	dec = create_attackdecay(high_db, inaudible_db, decay_length)
+
+	for i in range(0, leng * rate) :
+		if(i < attack_length) :
+			amplitude_array.append(att[i])
+		elif(leng * rate - i < decay_length) :
+			amplitude_array.append(dec[decay_length - (leng * rate) + i])
+		else :
+			amplitude_array.append(math.pow(10, high_db))
+	return amplitude_array
+
+"""
+i = 0
+small = []
+for a in ar :
+	if( i % 100 == 0) : 
+		small.append(a)
+		#pass
+	i += 1
+#print(small)
+
+import matplotlib.pyplot as plt
+
+plt.plot(small)
+
+plt.xlabel('time (s)')
+plt.ylabel('AMPLITUDE')
+plt.grid(True)
+plt.show()
+
+"""
 
 
-def createSample(leng, rate, f = 440) :
+def createSample(leng, rate, ampl_array, f = 440) :
 	"""
 	create an array representing a sample
 
@@ -100,21 +168,15 @@ def createSample(leng, rate, f = 440) :
 	"""
 
 	samples = (np.sin(2*np.pi*np.arange(rate*leng)*f/rate)).astype(np.float32)
-	decibels = 0
-	negdec = 200
-	for i in range(0, len(samples)) :
-		inc =  negdec * (1 / (leng * rate))
-		decibels = decibels - inc
-		vol = math.pow(10, decibels/20)
-		samples[i] = samples[i] * vol
-		if( i % 200 == 0) : 
-			pass
+	samples = np.multiply(samples, ampl_array)
+
 	return samples
 
-def createNote(note, octave, leng=1, rate=rate) :
+def createNote(note, octave, leng=1, articulation='regular', rate=rate) :
 	"""
 	Create an array of a musical note from a given
-	note, octave, and length
+	note, octave, and length.
+	Articulation is used to specify staccato, legato, etc.
 
 	TODO: add a length field like 
 		quarter note, eighth note, sixteenth, etc 
@@ -123,7 +185,8 @@ def createNote(note, octave, leng=1, rate=rate) :
 	f = frequencies[note.upper()]
 	adjustfactor = math.pow(2, octave - 4)
 	f = f * adjustfactor
-	note = createSample(leng, int(rate), f)
+	ampl_arr = articulations[articulation]
+	note = createSample(leng, int(rate), ampl_arr, f)
 	return note
 
 
@@ -206,6 +269,18 @@ def rand_sequence(items, num_positions) :
 #timing. using this to evaluate performance
 timer = time.time()
 
+"""
+Temporary articulations dict for eight notes
+Will have to rework this part
+"""
+articulations = {
+	'regular' : create_ampl_array(1, 10000, .7),
+	'staccato' : create_ampl_array(1, 10000, .80),
+	'legato' :	create_ampl_array(1, 10000, .625),
+	'staccatissimo' : create_ampl_array(1, 10000, .90),
+}
+
+
 
 #master sequence that I add samples to. silent
 beats = 4
@@ -215,12 +290,28 @@ big = create_empty_sample(beats, rate)
 #create random sequence of (note, octave, position) tuples
 randseq = rand_sequence(12, 16)
 
+"""
+#Play a scale (for testing)
+sequence = [("c", 4), ('d', 4), ("e", 4), ('f', 4),
+			("g", 4), ('a', 4), ("b", 4), ('c', 5),
+]
+i = 0
+seq2 = []
+for note, octave in sequence :
+	seq2.append((note, octave, i))
+	i += 2
+"""
+
+
 #create samples based on our random sequence
 #store in list
 samples = []
-for note, octave, pos in randseq :
-	n = createNote(note, octave, leng=.5), pos
+#for note, octave, pos in randseq:
+for note, octave, pos in randseq:
+	n = createNote(note, octave, leng=.5, 
+		articulation='staccato'), pos
 	samples.append(n)
+
 
 #add samples to the master sample
 for samp, pos in samples :
