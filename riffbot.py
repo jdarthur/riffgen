@@ -1,4 +1,3 @@
-import pyaudio
 import wave
 import sys
 import numpy as np
@@ -7,6 +6,7 @@ import time
 import sounddevice as sd
 import math
 import random
+from bigsample import BigSample 
 
 """
 DONE: 
@@ -285,7 +285,7 @@ articulations = {
 #master sequence that I add samples to. silent
 beats = 4
 positions = beats * 8
-big = create_empty_sample(beats, rate)
+big = BigSample(beats, rate)
 
 #create random sequence of (note, octave, position) tuples
 randseq = rand_sequence(12, 16)
@@ -309,20 +309,21 @@ samples = []
 #for note, octave, pos in randseq:
 for note, octave, pos in randseq:
 	n = createNote(note, octave, leng=.5, 
-		articulation='staccato'), pos
+		articulation='staccatissimo'), pos
 	samples.append(n)
 
 
 #add samples to the master sample
 for samp, pos in samples :
-	big = add_sample(big, samp, pos, positions)
+	big.add_inplace(samp, pos, positions)
 
 #second timer to calculate elapsed time
 t2 = time.time() - timer
 print("runtime: {0}s".format(t2))
 
-
+time.sleep(1)
 #actually play our sample
-sd.play(big, rate)
+bytes1 = big.get_bytes()
+sd.play(bytes1, rate, blocking=True)
 
-time.sleep(beats)
+#ime.sleep(beats)
