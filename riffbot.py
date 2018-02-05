@@ -6,7 +6,8 @@ import time
 import sounddevice as sd
 import math
 import random
-from bigsample import BigSample 
+from bigsample import BigSample
+from utils import choose_weighted
 
 """
 DONE: 
@@ -59,7 +60,7 @@ frequencies = {
 'A'   :	440,
 'A#'  :	466.164,
 'B'   :	493.883,
-'rest' : 0,  
+'REST' : 0,  
 }
 """
 global sampling rate
@@ -258,6 +259,18 @@ def rand_sequence(items, num_positions) :
 	return seq
 
 
+def rand_seq_reprise(items, num_positions) :
+	choices = ['c', 'd', 'e', 'f', 'g', 'a', 'b', 'rest']
+	weights = [ 30,  10,  30,  10,  30,  10,  10, 50]
+	seq = []
+
+	for i in range(0, items) :
+		note = choose_weighted(choices, weights)
+		pos = i * 2
+		seq.append((note, 4, pos))
+	return seq
+
+
 """
 ===================================================
 				  SCRIPT PART
@@ -274,10 +287,10 @@ Temporary articulations dict for eight notes
 Will have to rework this part
 """
 articulations = {
-	'regular' : create_ampl_array(1, 10000, .7),
-	'staccato' : create_ampl_array(1, 10000, .80),
-	'legato' :	create_ampl_array(1, 10000, .625),
-	'staccatissimo' : create_ampl_array(1, 10000, .90),
+	'regular' : create_ampl_array(1, 20000, .7),
+	'staccato' : create_ampl_array(1, 20000, .80),
+	'legato' :	create_ampl_array(1, 20000, .625),
+	'staccatissimo' : create_ampl_array(1, 20000, .90),
 }
 
 
@@ -288,17 +301,17 @@ positions = beats * 8
 big = BigSample(beats, rate)
 
 #create random sequence of (note, octave, position) tuples
-randseq = rand_sequence(12, 16)
+randseq = rand_seq_reprise(12, 16)
 
 """
 #Play a scale (for testing)
-sequence = [("c", 4), ('d', 4), ("e", 4), ('f', 4),
+sequence = [("c", 4,), ('d', 4), ("e", 4), ('f', 4),
 			("g", 4), ('a', 4), ("b", 4), ('c', 5),
 ]
 i = 0
-seq2 = []
+randseq= []
 for note, octave in sequence :
-	seq2.append((note, octave, i))
+	randseq.append((note, octave, i))
 	i += 2
 """
 
@@ -308,8 +321,8 @@ for note, octave in sequence :
 samples = []
 #for note, octave, pos in randseq:
 for note, octave, pos in randseq:
-	n = createNote(note, octave, leng=.5, 
-		articulation='staccatissimo'), pos
+	n = createNote(note, octave, leng=1, 
+		articulation='staccato'), pos
 	samples.append(n)
 
 
