@@ -7,7 +7,7 @@ def choose_weighted(choices, weights) :
 	TODO: make this a less trash implementation
 
 	"""
-	
+
 	total = 0
 	for i in weights :
 		total = total + i
@@ -19,8 +19,7 @@ def choose_weighted(choices, weights) :
 	return(bucket[selection])
 
 
-
-
+"""
 options = ['a', 'b', 'c', 'd']
 weights = [10, 20, 100, 10] 
 
@@ -33,3 +32,4 @@ for i in range(0, 1000) :
 	op_d[choice] += 1
 
 print(op_d)
+"""

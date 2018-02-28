@@ -1,5 +1,4 @@
 import numpy as np
-import numba
 
 def create_empty_sample(leng, rate) :
 	"""	
