@@ -14,14 +14,15 @@ class Scale :
 		octaves: number of octaves available to scale
 			5 is roughly what you've got available on a digital keyboard
 	"""
-	def __init__(self, base_frequency=64, semitones=12, octaves=5) :
+	def __init__(self, base_frequency=64.0, semitones=12, octaves=5) :
 		self.freq_list = []
 		self.MIN_PITCH = 0
 		self.MAX_PITCH = semitones * octaves - 1
 
 		for i in range(0, octaves * semitones) :
-			freq = math.pow(2, i / semitones) * base_frequency
+			freq = math.pow(2, float(i) / float(semitones)) * base_frequency
 			self.freq_list.append(freq)
+		#print(self.freq_list)
 
 	def get_frequency(self, abs_pitch) :
 		return self.freq_list[abs_pitch]
