@@ -1,4 +1,5 @@
-from scale import Scale
+from .scale import Scale
+from .constants import *
 
 class Note :
 	"""
@@ -23,8 +24,8 @@ class Note :
 	"""
 
 	def __init__(self, abs_pitch=None, abs_duration=None, tone=None, octave=None, notelength=None, chromatic=None, scale=None) :
-		self.duration_list = ['thirty-second', 'sixteenth', 'eighth', 'quarter', 'half', 'whole']
-
+		
+		self.duration_list = duration_list
 		if(scale == None) :
 			self.scale = Scale()
 		else :
