@@ -1,4 +1,6 @@
-class Note:
+from scale import Scale
+
+class Note :
 	"""
 	A note is a combination of pitch + duration.
 	
@@ -20,10 +22,14 @@ class Note:
 	represents a G# quarter note in octave 2
 	"""
 
-	def __init__(self, abs_pitch=None, abs_duration=None, tone=None, octave=None, notelength=None, chromatic=None) :
-		if(chromatic ==  None) :
-			self.chromatic = ['c','c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b']
+	def __init__(self, abs_pitch=None, abs_duration=None, tone=None, octave=None, notelength=None, chromatic=None, scale=None) :
 		self.duration_list = ['thirty-second', 'sixteenth', 'eighth', 'quarter', 'half', 'whole']
+
+		if(scale == None) :
+			self.scale = Scale()
+		else :
+			self.scale = scale
+		self.chromatic = self.scale.chromatic
 
 		if(abs_pitch == None) :
 			if(tone == None) :
@@ -32,10 +38,10 @@ class Note:
 				raise PitchError("Missing octave")
 			abs_pitch = self.get_abs_pitch(tone, octave)
 
-		if(abs_pitch < 0) :
-			raise PitchError("Pitch {0} is less than min 0.".format(abs_pitch))
-		if(abs_pitch > 60) :
-			raise PitchError("Pitch {0} is greater than max 60.".format(abs_pitch))
+		if(abs_pitch < self.scale.MIN_PITCH) :
+			raise PitchError("Pitch {0} is less than min {1}.".format(abs_pitch, self.scale.MIN_PITCH))
+		if(abs_pitch > self.scale.MAX_PITCH) :
+			raise PitchError("Pitch {0} is greater than max {1}.".format(abs_pitch, self.scale.MAX_PITCH))
 		self.abs_pitch = abs_pitch
 
 		if(abs_duration == None) :
@@ -48,6 +54,8 @@ class Note:
 		if(abs_duration > 5) :
 			raise DurationError("Duration {0} is greater than max 5.".format(abs_duration))
 		self.abs_duration = abs_duration
+		self.frequency = self.scale.get_frequency(self.abs_pitch)
+
 	
 	def to_human_readable(self) :
 		tone = self.chromatic[self.abs_pitch % 12].upper()
@@ -64,6 +72,7 @@ class Note:
 
 	def get_abs_duration(self, notelength) :
 		return self.duration_list.index(notelength)
+
 
 """
 Exceptions for illegal Pitch + Duration input
