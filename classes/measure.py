@@ -22,6 +22,7 @@ class Measure :
 		self.MAX_POSITION = 32 * (self.top / self.bottom) - 1
 		self.tempo = tempo
 		self.note_dict = {}
+		self.beats = int(32 * (self.top / self.bottom) / 8)
 
 	def add(self, note, position) :
 		if(position > self.MAX_POSITION) : 

@@ -54,33 +54,30 @@ def random_measure(notecount) :
 		measure.add(note, position)
 	return measure
 
+def add_to_bigsample(measure, bigsample) :
+	samples = []
+	for key in m.note_dict :
+		freq = m.note_dict[key][0]
+		length = m.note_dict[key][1]
+		tup = (createSample(freq, length), key)
+		samples.append(tup)
+
+	#add samples to the master sample
+	for samp, pos in samples :
+		big.add_inplace(samp, pos, m.MAX_POSITION + 1)
+
 #timing. using this to evaluate performance
 timer = time.time()
 
-m = random_measure(8)
-print(m.note_dict)
+m = random_measure(12)
 
-samples = []
-for key in m.note_dict :
-	freq = m.note_dict[key][0]
-	length = m.note_dict[key][1]
-	tup = (createSample(freq, length), key)
-	samples.append(tup)
-
-#master sequence that I add samples to. silent
-beats = 4
-positions = m.MAX_POSITION + 1
-big = BigSample(beats, rate)
-
-#add samples to the master sample
-for samp, pos in samples :
-	big.add_inplace(samp, pos, positions)
+big = BigSample(m.beats, rate)
+add_to_bigsample(m, big)
 
 #second timer to calculate elapsed time
 t2 = time.time() - timer
 print("runtime: {0}s".format(t2))
 
-time.sleep(1)
 #actually play our sample
 bytes1 = big.get_bytes()
 sd.play(bytes1, rate, blocking=True)
