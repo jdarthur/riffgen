@@ -5,6 +5,8 @@ import sounddevice as sd
 from bigsample import BigSample
 from classes.note import Note
 from classes.measure import Measure
+from utils import choose_weighted
+import random
 
 
 """
@@ -35,20 +37,27 @@ def createSample(frequency, length, articulation='regular', rate=rate) :
 
 	return samples
 
+def random_measure(notecount) :
+	measure = Measure()
+	tonechoices = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
+	toneweights = [ 30,  10,  30,  10,  30,  10,  10]
+
+	lenchoices = ['quarter', 'eighth', 'sixteenth']
+	lenweights = [ 30,  50,  10]
+	seq = []
+
+	for i in range(0, notecount) :
+		tone = choose_weighted(tonechoices, toneweights)
+		notelength = choose_weighted(lenchoices, lenweights)
+		note = Note(tone=tone, octave=2, notelength=notelength)
+		position = random.randint(0, int(measure.MAX_POSITION/2)) * 2
+		measure.add(note, position)
+	return measure
 
 #timing. using this to evaluate performance
 timer = time.time()
 
-"""
-Temporary articulations dict for eight notes
-Will have to rework this part
-"""
-
-G = Note(tone="g", octave=2, notelength="quarter")
-A = Note(tone="a", octave=2, notelength="eighth")
-m = Measure()
-m.add(G, 0)
-m.add(A, 8)
+m = random_measure(8)
 print(m.note_dict)
 
 samples = []
