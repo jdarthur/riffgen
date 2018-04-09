@@ -21,6 +21,7 @@ class Measure :
 		self.MIN_POSITION = 0
 		self.MAX_POSITION = 32 * (self.top / self.bottom) - 1
 		self.tempo = tempo
+		self.position_length = float(tempo/120) / 8
 		self.note_dict = {}
 		self.beats = int(32 * (self.top / self.bottom) / 8)
 
