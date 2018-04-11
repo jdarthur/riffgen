@@ -5,7 +5,7 @@ import sounddevice as sd
 from classes.note import Note
 from classes.measure import Measure
 from classes.riff import Riff
-from utils import choose_weighted
+from lib.utils import choose_weighted
 import random
 
 
@@ -21,18 +21,20 @@ def random_measure(notecount) :
 	"""
 	measure = Measure()
 	tonechoices = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
-	toneweights = [ 30,  10,  30,  10,  30,  10,  10]
+	toneweights = [ 30,  10,  10,  10,  30,  10,  10]
 
 	lenchoices = ['quarter', 'eighth', 'sixteenth']
-	lenweights = [ 30,  50,  10]
+	lenweights = [ 30,  700,  30]
 	seq = []
 
+	pos = 0
 	for i in range(0, notecount) :
 		tone = choose_weighted(tonechoices, toneweights)
 		notelength = choose_weighted(lenchoices, lenweights)
 		note = Note(tone=tone, octave=2, notelength=notelength)
-		position = random.randint(0, int(measure.MAX_POSITION/2)) * 2
-		measure.add(note, position)
+		pos += note.len
+		if(pos + note.len <= measure.MAX_POSITION) :
+			measure.add(note, pos)
 	return measure
 
 

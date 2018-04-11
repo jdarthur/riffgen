@@ -56,6 +56,8 @@ class Note :
 			raise DurationError("Duration {0} is greater than max 5.".format(abs_duration))
 		self.abs_duration = abs_duration
 		self.frequency = self.scale.get_frequency(self.abs_pitch)
+		self.hr_note, self.hr_duration = self.to_human_readable()
+		self.len = lendict[self.hr_duration]
 
 	
 	def to_human_readable(self) :
