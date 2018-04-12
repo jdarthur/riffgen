@@ -21,10 +21,10 @@ def random_measure(notecount) :
 	"""
 	measure = Measure()
 	tonechoices = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
-	toneweights = [ 30,  10,  10,  10,  30,  10,  10]
+	toneweights = [ 50,  10,  10,  10,  10,  10,  10]
 
 	lenchoices = ['quarter', 'eighth', 'sixteenth']
-	lenweights = [ 30,  700,  30]
+	lenweights = [ 30,  100,  30]
 	seq = []
 
 	pos = 0
