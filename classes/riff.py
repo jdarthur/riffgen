@@ -31,7 +31,7 @@ class Riff:
         for item in measures:
             for key in item.note_dict:
                 self.riff_dict[key * item.position_length + self.runtime] = item.note_dict[key]
-            self.runtime += float(item.MAX_POSITION + 1) * item.position_length
+            self.runtime += float(item.max_position + 1) * item.position_length
         print(self.riff_dict)
 
     def load_riff(self, filename):

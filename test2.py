@@ -33,7 +33,7 @@ def random_measure(notecount) :
 		notelength = choose_weighted(lenchoices, lenweights)
 		note = Note(tone=tone, octave=2, notelength=notelength)
 		pos += note.len
-		if(pos + note.len <= measure.MAX_POSITION) :
+		if(pos + note.len <= measure.max_position) :
 			measure.add(note, pos)
 	return measure
 
@@ -44,7 +44,7 @@ timer = time.time()
 m = random_measure(12)
 m2 = random_measure(12)
 
-r = Riff(Measures=[m, m2])
+r = Riff(measures=[m, m2])
 big = r.create_sample()
 bytes1 = big.get_bytes()
 
