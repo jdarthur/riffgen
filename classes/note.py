@@ -117,13 +117,13 @@ class DurationError(Exception):
         super().__init__(message)
 
 """
+#examples
+
 x = Note(32, 3)
 note, duration = x.to_human_readable()
 print(note) #G#(2)
 print(duration) #quarter
-"""
 
-"""
 y = Note(tone="g#", octave=2, notelength="quarter")
 note, duration = y.to_human_readable()
 print(note) #G#(2)
