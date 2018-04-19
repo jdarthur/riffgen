@@ -1,41 +1,41 @@
-import numpy as np
-import math
+"""
+Main class to generate a riff
+"""
+
 import time
 import sounddevice as sd
 from classes.note import Note
 from classes.measure import Measure
 from classes.riff import Riff
 from lib.utils import choose_weighted
-import random
 
 
 """
 ===================================================
-					METHODS
+                    METHODS
 ===================================================
 """
 
 def random_measure(notecount) :
-	"""
-	create a bunch of random notes in random locations
-	"""
-	measure = Measure()
-	tonechoices = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
-	toneweights = [ 50,  10,  10,  10,  10,  10,  10]
+    """
+    create a bunch of random notes in random locations
+    """
+    measure = Measure()
+    tonechoices = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
+    toneweights = [50, 10, 10, 10, 10, 10, 10]
 
-	lenchoices = ['quarter', 'eighth', 'sixteenth']
-	lenweights = [ 30,  100,  30]
-	seq = []
+    lenchoices = ['quarter', 'eighth', 'sixteenth']
+    lenweights = [30, 100, 30]
 
-	pos = 0
-	for i in range(0, notecount) :
-		tone = choose_weighted(tonechoices, toneweights)
-		notelength = choose_weighted(lenchoices, lenweights)
-		note = Note(tone=tone, octave=2, notelength=notelength)
-		pos += note.len
-		if(pos + note.len <= measure.max_position) :
-			measure.add(note, pos)
-	return measure
+    pos = 0
+    for i in range(0, notecount):
+        tone = choose_weighted(tonechoices, toneweights)
+        notelength = choose_weighted(lenchoices, lenweights)
+        note = Note(tone=tone, octave=2, notelength=notelength)
+        pos += note.len
+        if pos + note.len <= measure.max_position:
+            measure.add(note, pos)
+    return measure
 
 
 #timing. using this to evaluate performance
