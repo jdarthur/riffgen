@@ -16,11 +16,12 @@ from lib.utils import choose_weighted
 ===================================================
 """
 
-def random_measure(notecount) :
+def random_measure(notecount):
     """
     create a bunch of random notes in random locations
     """
     measure = Measure()
+    scale = measure.key
     tonechoices = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
     toneweights = [50, 10, 10, 10, 10, 10, 10]
 
@@ -31,7 +32,12 @@ def random_measure(notecount) :
     for i in range(0, notecount):
         tone = choose_weighted(tonechoices, toneweights)
         notelength = choose_weighted(lenchoices, lenweights)
-        note = Note(tone=tone, octave=2, notelength=notelength)
+        hr_dict = {
+            "tone" : tone,
+            "notelength" : notelength,
+            "octave" : 2
+        }
+        note = Note(scale=scale, hr_dict=hr_dict)
         pos += note.len
         if pos + note.len <= measure.max_position:
             measure.add(note, pos)
@@ -44,7 +50,9 @@ timer = time.time()
 m = random_measure(12)
 m2 = random_measure(12)
 
-r = Riff(measures=[m, m2])
+#r = Riff(measures=[m, m2])
+r = Riff(filename='test.riff')
+#r.write_riff("test.riff")
 big = r.create_sample()
 bytes1 = big.get_bytes()
 
