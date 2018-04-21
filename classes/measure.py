@@ -5,7 +5,7 @@ author: JD Arthur
 date: 7 Apr 2018
 """
 from .constants import duration_dict
-
+from .scale import Scale
 
 class Measure:
     """
@@ -21,7 +21,7 @@ class Measure:
        position_length:
             length of a 32nd note at our tempo
     """
-    def __init__(self, time_signature="common", tempo=120):
+    def __init__(self, time_signature="common", tempo=120, key=None):
         self.top = 0
         self.bottom = 0
         if time_signature == "common":
@@ -32,6 +32,13 @@ class Measure:
             self.bottom = 4
         else:
             print("Unsupported time signature")
+        self.time_signature = time_signature
+
+        if key is None:
+            self.key = Scale()
+        else:
+            self.key = key
+        self.chromatic = self.key.chromatic
 
         self.max_position = 32 * (self.top / self.bottom) - 1
         self.tempo = tempo
@@ -53,7 +60,8 @@ class Measure:
         if position > self.max_position:
             raise PositionError("Position {0} greater than " \
             	"max {1}".format(position, self.max_position))
-        self.note_dict[position] = (note.frequency, self.to_seconds(note))
+        #self.note_dict[position] = (note.frequency, self.to_seconds(note))
+        self.note_dict[position] = note
 
     def to_seconds(self, note):
         """
@@ -65,6 +73,24 @@ class Measure:
         note, duration = note.to_human_readable()
         fraction = duration_dict[duration]
         return (self.tempo / 60) * fraction
+
+    def serial(self):
+        """
+        return a minimal version of this object that can be used to reconstruct it
+        """
+        notes = {}
+        for pos in self.note_dict:
+            note = self.note_dict[pos]
+            notes[pos] = note.serial()
+
+        minimal = {
+            "key" : self.key.serial(),
+            "time_signature" : self.time_signature,
+            "tempo" : self.tempo,
+            "notes" : notes
+
+        }
+        return minimal
 
 
 class PositionError(Exception):
