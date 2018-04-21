@@ -7,6 +7,7 @@ import sounddevice as sd
 from classes.note import Note
 from classes.measure import Measure
 from classes.riff import Riff
+from classes.scale import Scale
 from lib.utils import choose_weighted
 
 
@@ -16,14 +17,18 @@ from lib.utils import choose_weighted
 ===================================================
 """
 
-def random_measure(notecount):
+def random_measure(notecount, scale=None, subscale=[0, 2, 4, 5, 7, 9, 11], toneweights=None):
     """
     create a bunch of random notes in random locations
     """
-    measure = Measure()
-    scale = measure.key
-    tonechoices = ['c', 'd', 'e', 'f', 'g', 'a', 'b']
-    toneweights = [50, 10, 10, 10, 10, 10, 10]
+    if scale is None:
+        scale = Scale()
+    measure = Measure(key=scale)
+    tonechoices = scale.sub_scale(subscale)
+    if toneweights is None:
+        toneweights = []
+        for choice in tonechoices:
+            toneweights.append(10)
 
     lenchoices = ['quarter', 'eighth', 'sixteenth']
     lenweights = [30, 100, 30]
@@ -43,16 +48,20 @@ def random_measure(notecount):
             measure.add(note, pos)
     return measure
 
-
 #timing. using this to evaluate performance
 timer = time.time()
 
-m = random_measure(12)
-m2 = random_measure(12)
+#m = random_measure(12)
+#m2 = random_measure(12)
 
-#r = Riff(measures=[m, m2])
-r = Riff(filename='test.riff')
-r.write_riff("test.riff")
+scale = Scale(semitones=7, chromatic=['a', 'b', 'c', 'd', 'e', 'f'])
+subscale = scale.sub_scale([0, 2, 4, 6])
+m = random_measure(12, scale=scale)
+m2 = random_measure(12, scale=scale)
+
+r = Riff(measures=[m, m2])
+#r = Riff(filename='test.riff')
+#r.write_riff("test.riff")
 big = r.create_sample()
 bytes1 = big.get_bytes()
 

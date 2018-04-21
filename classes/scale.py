@@ -48,6 +48,21 @@ class Scale:
     	"""
         return self.freq_list[abs_pitch]
 
+    def sub_scale(self, indices):
+        """
+        get a scale that is a subset of the chromatic scale
+        Ex: a Major scale would be
+           scale.subscale([0, 2, 4, 5, 7, 9, 11])
+        """
+        sub_scale = []
+        for item in indices:
+            if item >= len(self.chromatic):
+                pass
+            else:
+                sub_scale.append(self.chromatic[item])
+        return sub_scale
+
+
     def serial(self):
         """
         return a minimal version of this object that can be used to reconstruct it
