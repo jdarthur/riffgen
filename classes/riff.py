@@ -75,7 +75,6 @@ class Riff:
         out_list = []
         for item in self.measures:
             out_list.append(item.serial())
-        print(out_list)
         with open(filename, 'wb+') as file_obj:
             pickle.dump(out_list, file_obj)
 

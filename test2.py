@@ -52,7 +52,7 @@ m2 = random_measure(12)
 
 #r = Riff(measures=[m, m2])
 r = Riff(filename='test.riff')
-#r.write_riff("test.riff")
+r.write_riff("test.riff")
 big = r.create_sample()
 bytes1 = big.get_bytes()
 
