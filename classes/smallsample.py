@@ -8,7 +8,7 @@ date: 7 April 2018
 import math
 import numpy as np
 
-BASE_DB = -15
+BASE_DB = -26
 
 def a_weight(frequency):
     """
@@ -48,19 +48,14 @@ class SmallSample:
         """
         self.sample = (np.sin(2 * np.pi * np.arange(rate * length) *
                               frequency / rate)).astype(np.float32)
-        print(frequency)
         self.adjusted_db = a_weight(frequency)
-        #print(self.adjusted_db)
         self.deamplify(scale_factor(self.adjusted_db))
 
     def deamplify(self, scale_factor):
         """
         lower average amplitude by scale factor to even out perceived sound levels
         """
-        print(scale_factor)
-        self.sample = np.multiply(self.sample, scale_factor)        
-
-
+        self.sample = np.multiply(self.sample, scale_factor)
 
     def create_attackdecay(self, start_decibels, end_decibels, length):
         """
