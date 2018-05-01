@@ -8,6 +8,31 @@ date: 7 April 2018
 import math
 import numpy as np
 
+BASE_DB = -15
+
+def a_weight(frequency):
+    """
+    perform a-weighting operation to fix subjective loudness
+    based on frequency
+    """
+    f_squared = math.pow(frequency, 2)
+    numerator = math.pow(12194, 2) * math.pow(f_squared, 2)
+    denominator = ((f_squared + math.pow(20.6, 2)) *
+                   (math.sqrt((f_squared + math.pow(107.7, 2)) *
+                              (f_squared + math.pow(737.9, 2)))) *
+                   (f_squared + math.pow(12194, 2)))
+    ra_f = numerator / denominator
+    adjusted = 20 * math.log10(ra_f) + 2.00
+    return adjusted
+
+def scale_factor(db_a):
+    """
+    get the amplitude scale factor from our dbA
+    to calculate what we need to multiply by to
+    """
+    g_db = BASE_DB - db_a
+    scalefac = math.pow(10, g_db / 20)
+    return scalefac
 
 class SmallSample:
     """
@@ -21,8 +46,20 @@ class SmallSample:
 
         ampl_arr = articulations[length][articulation]
         """
-        self.sample = (np.sin(2*np.pi*np.arange(rate*length)*frequency/rate)).astype(np.float32)
-        #samples = np.multiply(samples, ampl_arr)
+        self.sample = (np.sin(2 * np.pi * np.arange(rate * length) *
+                              frequency / rate)).astype(np.float32)
+        print(frequency)
+        self.adjusted_db = a_weight(frequency)
+        #print(self.adjusted_db)
+        self.deamplify(scale_factor(self.adjusted_db))
+
+    def deamplify(self, scale_factor):
+        """
+        lower average amplitude by scale factor to even out perceived sound levels
+        """
+        for item in self.sample:
+            item = item * scale_factor
+
 
 
     def create_attackdecay(self, start_decibels, end_decibels, length):
