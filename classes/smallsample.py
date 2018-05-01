@@ -57,8 +57,8 @@ class SmallSample:
         """
         lower average amplitude by scale factor to even out perceived sound levels
         """
-        for item in self.sample:
-            item = item * scale_factor
+        print(scale_factor)
+        self.sample = np.multiply(self.sample, scale_factor)        
 
 
 
