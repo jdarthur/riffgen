@@ -6,5 +6,6 @@ dependencies (with `CentOS install syntax`):
  - python3 (`yum install epel-release`; `yum install python34`)
  - numpy (`pip3 install numpy`)
  - sounddevice (`pip3 install sounddevice`)
+ - tkinter (`yum install python34-tkinter`)
  
 Files in `classes/` represent various musical concepts as Python objects
